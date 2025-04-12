@@ -44,7 +44,7 @@ jobs:
        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
        args: >
-         -Dproject.settings=maas-service/sonar-project.properties
+         -Dproject.settings=maas-agent-service/sonar-project.properties
          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
          -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
          -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
