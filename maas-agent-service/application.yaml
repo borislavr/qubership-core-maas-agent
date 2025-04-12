@@ -1,0 +1,22 @@
+microservice:
+  name: maas-agent
+  namespace: namespace
+
+maas:
+  enabled: false
+  internal:
+    address: http://localhost:8080
+  agent:
+    credentials:
+      username: maas-agent
+      password: maas-agent
+    namespace:
+      isolation:
+        enabled: true
+
+execution:
+  mode: active
+
+consul:
+  enabled: false
+  url: http://consul-server.consul:8500

@@ -1,0 +1,212 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+    name: "{{ .Values.SERVICE_NAME }}"
+    labels:
+      name: '{{ .Values.SERVICE_NAME }}'
+      app.kubernetes.io/name: '{{ .Values.SERVICE_NAME }}'
+      app.kubernetes.io/instance: '{{ cat .Values.SERVICE_NAME "-" .Values.NAMESPACE | nospace | trunc 63 | trimSuffix "-" }}'
+      app.kubernetes.io/version: '{{ .Values.ARTIFACT_DESCRIPTOR_VERSION }}'
+      app.kubernetes.io/component: 'proxy'
+      app.kubernetes.io/part-of: 'Cloud-Core'
+      app.kubernetes.io/managed-by: 'saasDeployer'
+      app.kubernetes.io/technology: 'go'
+      netcracker.cloud/disaster-recovery.manageable: 'true'
+      deployment.netcracker.com/sessionId: '{{ .Values.DEPLOYMENT_SESSION_ID }}'
+    annotations:
+        netcracker.cloud/start.stage: '1'
+spec:
+    selector:
+        matchLabels:
+          name: '{{ .Values.SERVICE_NAME }}'
+    replicas: {{ .Values.REPLICAS | default 1 }}
+    revisionHistoryLimit: 3
+    strategy:
+    {{- if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "recreate" }}
+      type: Recreate
+    {{- else if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "best_effort_controlled_rollout" }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 0
+        maxUnavailable: 80%
+    {{- else if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "ramped_slow_rollout" }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+    {{- else if eq (default "" .Values.DEPLOYMENT_STRATEGY_TYPE) "custom_rollout" }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: {{ .Values.DEPLOYMENT_STRATEGY_MAXSURGE | default "25%" }}
+        maxUnavailable: {{ .Values.DEPLOYMENT_STRATEGY_MAXUNAVAILABLE | default "25%" }}
+    {{- else }}
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+    {{- end }}
+    template:
+        metadata:
+            labels:
+              name: '{{ .Values.SERVICE_NAME }}'
+              app.kubernetes.io/name: '{{ .Values.SERVICE_NAME }}'
+              app.kubernetes.io/instance: '{{ cat .Values.SERVICE_NAME "-" .Values.NAMESPACE | nospace | trunc 63 | trimSuffix "-" }}'
+              app.kubernetes.io/version: '{{ .Values.ARTIFACT_DESCRIPTOR_VERSION }}'
+              app.kubernetes.io/component: 'proxy'
+              app.kubernetes.io/part-of: 'Cloud-Core'
+              app.kubernetes.io/managed-by: 'saasDeployer'
+              app.kubernetes.io/technology: 'go'
+        spec:
+            serviceAccountName: '{{ .Values.SERVICE_NAME }}'
+            volumes:
+                - name: client-credentials
+                  secret:
+                      secretName: "{{ .Values.SERVICE_NAME }}-client-credentials"
+{{ if .Values.INTERNAL_TLS_ENABLED }}
+                - name: tls
+                  secret:
+                      secretName: '{{ .Values.SERVICE_NAME }}-tls'
+{{ end }}
+{{ if and .Values.READONLY_CONTAINER_FILE_SYSTEM_ENABLED (eq .Values.PAAS_PLATFORM "KUBERNETES") }}
+                - name: sslcerts
+                  emptyDir: {}
+                - name: cacerts
+                  emptyDir: {}
+{{ end }}
+                - name: "{{ .Values.SSL_SECRET }}"
+                  secret:
+                      secretName: "{{ .Values.SSL_SECRET }}"
+            containers:
+                - name: "{{ .Values.SERVICE_NAME }}"
+                  image: "{{ .Values.IMAGE_REPOSITORY}}:{{ .Values.TAG }}"
+                  ports:
+                      - name: web
+                        containerPort: 8080
+                        protocol: TCP
+                  env:
+                      - name: CERTIFICATE_BUNDLE_{{ .Values.SSL_SECRET}}_MD5SUM
+                        value: "{{ .Values.CERTIFICATE_BUNDLE_MD5SUM }}"
+                      - name: EXECUTION_MODE
+                        value: "{{ .Values.EXECUTION_MODE }}"
+                      - name: INTERNAL_TLS_ENABLED
+                        value: '{{ .Values.INTERNAL_TLS_ENABLED }}'
+{{ if .Values.INTERNAL_TLS_ENABLED }}
+                      - name: CERTIFICATE_FILE_PASSWORD
+                        valueFrom:
+                          secretKeyRef:
+                            name: 'tls-password-secret'
+                            key: 'tls-password'
+                      - name: CERTIFICATE_FILE_PATH
+                        value: '/etc/tls'
+{{ end }}
+                      - name: CLOUD_NAMESPACE
+                        valueFrom:
+                            fieldRef:
+                                fieldPath: metadata.namespace
+                      - name: MICROSERVICE_NAMESPACE
+                        valueFrom:
+                          fieldRef:
+                            fieldPath: metadata.namespace
+                      - name: MICROSERVICE_NAME
+                        value: "{{ .Values.SERVICE_NAME }}"
+                      - name: OPENSHIFT_MICROSERVICE_NAME
+                        value: "{{ .Values.SERVICE_NAME }}"
+                      - name: MAAS_INTERNAL_ADDRESS
+                        value: "{{ .Values.MAAS_INTERNAL_ADDRESS }}"
+                      - name: MAAS_ENABLED
+                        value: "{{ .Values.MAAS_ENABLED }}"
+                      - name: TRACING_ENABLED
+                        value: '{{ .Values.TRACING_ENABLED }}'
+                      - name: MAAS_AGENT_NAMESPACE_ISOLATION_ENABLED
+                        value: '{{ .Values.MAAS_AGENT_NAMESPACE_ISOLATION_ENABLED }}'
+                      - name: TRACING_HOST
+                        value: '{{ .Values.TRACING_HOST }}'
+                      - name: TRACING_SAMPLER_RATELIMITING
+                        value: '{{ .Values.TRACING_SAMPLER_RATELIMITING }}'
+                      - name: LOG_LEVEL
+                        value: '{{ .Values.LOG_LEVEL }}'
+                      - name: CONSUL_ENABLED
+                        value: '{{ .Values.CONSUL_ENABLED }}'
+                        {{ if .Values.CONSUL_ENABLED }}
+                      - name: CONSUL_URL
+                        value: '{{ .Values.CONSUL_URL }}'
+                        {{ end }}
+                      - name: MAAS_AGENT_CREDENTIALS_USERNAME
+                        valueFrom:
+                            secretKeyRef:
+                                name: "cluster-{{ .Values.SERVICE_NAME }}-credentials-secret"
+                                key: username
+                      - name: MAAS_AGENT_CREDENTIALS_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: "cluster-{{ .Values.SERVICE_NAME }}-credentials-secret"
+                                key: password
+                  resources:
+                      requests:
+                          cpu: "{{ .Values.CPU_REQUEST }}"
+                          memory: "{{ .Values.MEMORY_LIMIT }}"
+                      limits:
+                          cpu: "{{ .Values.CPU_LIMIT }}"
+                          memory: "{{ .Values.MEMORY_LIMIT }}"
+                  livenessProbe:
+                      httpGet:
+                          path: /health
+                          port: {{ if .Values.INTERNAL_TLS_ENABLED }} tls {{ else }} web {{ end }}
+                          scheme: {{ if .Values.INTERNAL_TLS_ENABLED }} HTTPS {{ else }} HTTP {{ end }}
+                      initialDelaySeconds: 180
+                      timeoutSeconds: 30
+                  readinessProbe:
+                      httpGet:
+                        path: /health
+                        port: {{ if .Values.INTERNAL_TLS_ENABLED }} tls {{ else }} web {{ end }}
+                        scheme: {{ if .Values.INTERNAL_TLS_ENABLED }} HTTPS {{ else }} HTTP {{ end }}
+                      initialDelaySeconds: 5
+                      timeoutSeconds: 30
+                  securityContext:
+{{ if eq .Values.PAAS_PLATFORM "KUBERNETES" }}
+                      runAsGroup: 10001
+{{ end }}
+                      readOnlyRootFilesystem: {{ and .Values.READONLY_CONTAINER_FILE_SYSTEM_ENABLED (eq .Values.PAAS_PLATFORM "KUBERNETES") }}
+                      runAsNonRoot: true
+                      seccompProfile:
+                          type: RuntimeDefault
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                          drop:
+                            - ALL
+                  volumeMounts:
+                      - name: client-credentials
+                        mountPath: "/etc/secret"
+                        readOnly: true
+{{ if .Values.INTERNAL_TLS_ENABLED }}
+                      - name: tls
+                        mountPath: '/etc/tls'
+                        readOnly: true
+{{ end }}
+{{ if and .Values.READONLY_CONTAINER_FILE_SYSTEM_ENABLED (eq .Values.PAAS_PLATFORM "KUBERNETES") }}
+                      - name: sslcerts
+                        mountPath: /etc/ssl/certs
+                      - name: cacerts
+                        mountPath: /usr/local/share/ca-certificates
+{{ end }}
+                      - name: "{{ .Values.SSL_SECRET }}"
+                        mountPath: "/tmp/cert/{{ .Values.SSL_SECRET }}"
+            topologySpreadConstraints:
+{{- if .Values.CLOUD_TOPOLOGIES }}
+{{- range $v := .Values.CLOUD_TOPOLOGIES }}
+              - topologyKey: {{ $v.topologyKey }}
+                maxSkew: {{ $v.maxSkew | default 1 }}
+                whenUnsatisfiable: {{ $v.whenUnsatisfiable | default "ScheduleAnyway" }}
+                labelSelector:
+                  matchLabels:
+                    name: "{{ $.Values.SERVICE_NAME }}"
+{{- end }}
+{{- else }}
+              - maxSkew: 1
+                topologyKey: "{{ .Values.CLOUD_TOPOLOGY_KEY }}"
+                whenUnsatisfiable: ScheduleAnyway
+                labelSelector:
+                  matchLabels:
+                    name: "{{ .Values.SERVICE_NAME }}"
+{{- end }}

@@ -1,0 +1,12 @@
+/.idea
+/.vscode
+/*.iml
+**/coverage.out
+
+/maas-agent-service/bin
+/maas-agent-service/*.iml
+
+/maas-agent-integration-tests/bin
+/maas-agent-integration-tests/*.iml
+/maas-agent-integration-tests/go.sum
+/maas-agent-integration-tests/target
