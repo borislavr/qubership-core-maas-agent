@@ -48,7 +48,7 @@ jobs:
          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
          -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
          -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
-         -Dsonar.go.coverage.reportPaths=maas-service/coverage.out
+         -Dsonar.go.coverage.reportPaths=maas-agent-service/coverage.out
 
     - name: Log in to GitHub Container Registry
       uses: docker/login-action@v2
