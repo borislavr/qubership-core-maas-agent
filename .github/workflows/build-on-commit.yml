@@ -30,12 +30,12 @@ jobs:
 
     - name: Build
       run: |
-        cd maas-service
-        CGO_ENABLED=0 go build -o maas-service
+        cd maas-agent-service
+        CGO_ENABLED=0 go build
 
     - name: Test with coverage
       run: |
-        cd maas-service
+        cd maas-agent-service
         go test -v ./... -coverprofile coverage.out
 
     - name: Upload coverage report to SonarCloud
