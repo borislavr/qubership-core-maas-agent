@@ -12,10 +12,6 @@ metadata:
       app.kubernetes.io/part-of: 'Cloud-Core'
       app.kubernetes.io/managed-by: 'saasDeployer'
       app.kubernetes.io/technology: 'go'
-      netcracker.cloud/disaster-recovery.manageable: 'true'
-      deployment.netcracker.com/sessionId: '{{ .Values.DEPLOYMENT_SESSION_ID }}'
-    annotations:
-        netcracker.cloud/start.stage: '1'
 spec:
     selector:
         matchLabels:
