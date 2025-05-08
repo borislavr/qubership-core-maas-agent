@@ -7,12 +7,12 @@ require (
 	github.com/gofiber/fiber/v2 v2.52.6
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/google/uuid v1.6.0
-	github.com/netcracker/qubership-core-lib-go-actuator-common/v2 v2.0.0-20250418112911-f47fac14e727
-	github.com/netcracker/qubership-core-lib-go-fiber-server-utils/v2 v2.0.0-20250418113603-a37075fdfad1
-	github.com/netcracker/qubership-core-lib-go-rest-utils/v2 v2.0.0-20250410090425-f8bcf3d43e4a
-	github.com/netcracker/qubership-core-lib-go/v3 v3.0.0-20250418111846-e6298a4441a0
+	github.com/netcracker/qubership-core-lib-go-actuator-common/v2 v2.0.0-20250505145427-766e76edee70
+	github.com/netcracker/qubership-core-lib-go-fiber-server-utils/v2 v2.0.0-20250505150321-09ac8e0e3ac2
+	github.com/netcracker/qubership-core-lib-go-rest-utils/v2 v2.0.0-20250507111222-22b01ae759f8
+	github.com/netcracker/qubership-core-lib-go/v3 v3.0.0-20250508122204-5cb3c4abfd2b
 	github.com/stretchr/testify v1.10.0
-	github.com/valyala/fasthttp v1.61.0
+	github.com/valyala/fasthttp v1.62.0
 )
 
 require (
@@ -28,7 +28,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
 	github.com/gofiber/adaptor/v2 v2.2.1 // indirect
-	github.com/hashicorp/consul/api v1.32.0 // indirect
+	github.com/hashicorp/consul/api v1.32.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
@@ -72,10 +72,10 @@ require (
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.35.0 // indirect
 	go.opentelemetry.io/otel/trace v1.35.0 // indirect
-	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
-	golang.org/x/net v0.39.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
+	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
