@@ -22,33 +22,36 @@ jobs:
     needs: prepare-variables
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.24.2'
 
+    - name: Install Sonar Scanner
+      run: npm install -g sonar-scanner
+
     - name: Build
-      run: |
-        cd maas-agent-service
-        CGO_ENABLED=0 go build
+      working-directory: maas-agent-service
+      run: CGO_ENABLED=0 go build
 
     - name: Test with coverage
-      run: |
-        cd maas-agent-service
-        go test -v ./... -coverprofile coverage.out
+      working-directory: maas-agent-service
+      run: go test -v ./... -coverprofile coverage.out
 
     - name: Upload coverage report to SonarCloud
-      uses: SonarSource/sonarcloud-github-action@v2
+      working-directory: maas-agent-service
+      run: |
+        sonar-scanner \
+          -Dproject.settings=sonar-project.properties \
+          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
+          -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
+          -Dsonar.host.url=${{ vars.SONAR_HOST_URL }} \
+          -Dsonar.go.coverage.reportPaths=coverage.out
       env:
-       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-       args: >
-         -Dproject.settings=maas-agent-service/sonar-project.properties
-         -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
-         -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
-         -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
-         -Dsonar.go.coverage.reportPaths=maas-agent-service/coverage.out
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
     - name: Log in to GitHub Container Registry
       uses: docker/login-action@v2
