@@ -1,3 +1,9 @@
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?metric=coverage&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
+[![duplicated_lines_density](https://sonarcloud.io/api/project_badges/measure?metric=duplicated_lines_density&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
+[![vulnerabilities](https://sonarcloud.io/api/project_badges/measure?metric=vulnerabilities&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
+[![bugs](https://sonarcloud.io/api/project_badges/measure?metric=bugs&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
+[![code_smells](https://sonarcloud.io/api/project_badges/measure?metric=code_smells&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
+
 # maas-agent
 
 `maas-agent` is just a proxy to MaaS service specified via properties. The main goal of this agent is to transform internal M2M security with 
