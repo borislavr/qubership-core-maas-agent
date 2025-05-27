@@ -1,3 +1,4 @@
+[![Go build](https://github.com/Netcracker/qubership-core-maas-agent/actions/workflows/go-build.yml/badge.svg)](https://github.com/Netcracker/qubership-core-maas-agent/actions/workflows/go-build.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?metric=coverage&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
 [![duplicated_lines_density](https://sonarcloud.io/api/project_badges/measure?metric=duplicated_lines_density&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
 [![vulnerabilities](https://sonarcloud.io/api/project_badges/measure?metric=vulnerabilities&project=Netcracker_qubership-core-maas-agent)](https://sonarcloud.io/summary/overall?id=Netcracker_qubership-core-maas-agent)
