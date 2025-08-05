@@ -28,7 +28,7 @@ jobs:
         with:
           command: cves
           #image: sbom://${{ github.event.repository.name }}-sbom.spdx.json
-          image: fs://.
+          image: fs://../${{ github.event.repository.name }}
           sarif-file: sarif.output.json
           summary: true
           ignore-base: true
