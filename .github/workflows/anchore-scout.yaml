@@ -15,11 +15,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Create SBOM
-        uses: anchore/sbom-action@v0
-        with:
-          format: spdx-json
-          output-file: "${{ github.event.repository.name }}-sbom.spdx.json"
+#      - name: Create SBOM
+#        uses: anchore/sbom-action@v0
+#        with:
+#          format: spdx-json
+#          output-file: "${{ github.event.repository.name }}-sbom.spdx.json"
       - name: Analyze for critical and high CVEs
         id: docker-scout-cves
         if: ${{ github.event_name != 'pull_request_target' }}
@@ -27,7 +27,8 @@ jobs:
         continue-on-error: true
         with:
           command: cves
-          image: sbom://${{ github.event.repository.name }}-sbom.spdx.json
+          #image: sbom://${{ github.event.repository.name }}-sbom.spdx.json
+          image: fs://.
           sarif-file: sarif.output.json
           summary: true
           ignore-base: true
