@@ -26,7 +26,7 @@ jobs:
         uses: docker/scout-action@v1
         continue-on-error: true
         with:
-          command: cves,recommendations
+          command: cves
           image: sbom://${{ github.event.repository.name }}-sbom.spdx.json
           sarif-file: sarif.output.json
           summary: true
