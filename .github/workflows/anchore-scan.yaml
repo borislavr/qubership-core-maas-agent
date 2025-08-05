@@ -1,0 +1,39 @@
+name: Anchore Scan
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  anchore:
+    permissions:
+      contents: read
+      security-events: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+############## Project scan ###################################
+      - name: Scan current project
+        id: scan-current-project
+        uses: anchore/scan-action@v6
+        with:
+          path: "."
+          fail-build: false
+          output-file: ${{ runner.temp }}/_github_home/output.sarif
+      - name: Upload SARIF result
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ runner.temp }}/_github_home/output.sarif
+
+      - name: grype / sarif to markdown
+        if: success() || failure()
+        id: sarif-to-markdown
+        uses: 11notes/action-sarif-to-markdown@v1.0.0
+        with:
+          sarif_file: output.sarif
+
+      - name: grype / report / print
+        run: cat ${{ runner.temp }}/_github_home/sarif.md >> $GITHUB_STEP_SUMMARY
