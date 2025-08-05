@@ -1,0 +1,35 @@
+name: Anchore-Scout
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  anchore:
+    permissions:
+      contents: read
+      security-events: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          format: spdx-json
+          output-file: "${{ github.event.repository.name }}-sbom.spdx.json"
+      - name: Analyze for critical and high CVEs
+        id: docker-scout-cves
+        if: ${{ github.event_name != 'pull_request_target' }}
+        uses: docker/scout-action@v1
+        continue-on-error: true
+        with:
+          command: cves,recommendations
+          image: sbom://${{ github.event.repository.name }}-sbom.spdx.json
+          sarif-file: sarif.output.json
+          summary: true
+          ignore-base: true
+          dockerhub-user: ${{ secrets.DOCKER_IO_USER }}
+          dockerhub-password: ${{ secrets.DOCKER_IO_PASSWORD }}
